@@ -43,6 +43,7 @@ const key_override_t ctrl_x_key_override = ko_make_with_layers(MOD_MASK_CTRL, KC
 const key_override_t ctrl_z_key_override = ko_make_with_layers(MOD_MASK_CTRL, KC_Z, G(KC_Z), 1);
 const key_override_t ctrl_f_key_override = ko_make_with_layers(MOD_MASK_CTRL, KC_F, G(KC_F), 1);
 const key_override_t ctrl_a_key_override = ko_make_with_layers(MOD_MASK_CTRL, KC_A, G(KC_A), 1);
+const key_override_t ctrl_d_key_override = ko_make_with_layers(MOD_MASK_CTRL, KC_D, G(KC_D), 1); // duplicate line
 
 // This globally defines all key overrides to be used
 const key_override_t **key_overrides = (const key_override_t *[]){
@@ -52,6 +53,7 @@ const key_override_t **key_overrides = (const key_override_t *[]){
 	&ctrl_z_key_override,
 	&ctrl_f_key_override,
 	&ctrl_a_key_override,
+	&ctrl_d_key_override,
 	NULL // Null terminate the array of overrides!
 };
  
