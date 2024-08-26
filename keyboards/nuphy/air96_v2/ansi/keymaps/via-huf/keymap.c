@@ -58,6 +58,40 @@ const key_override_t **key_overrides = (const key_override_t *[]){
   NULL // Null terminate the array of overrides!
 };
 
+
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//     switch (keycode) {
+//       case KC_D:
+//           if (get_mods() == MOD_BIT(KC_LCTL) || get_mods() == MOD_BIT(KC_RCTL)) {
+//               if (record->event.pressed && record->tap.count == 2) {
+//                   register_code(KC_Y);
+//               } else {
+//                   unregister_code(KC_Y);
+//               }
+//               // Do not let QMK process the keycode further
+//               return false;
+//           }
+//           // Else, let QMK process the KC_D keycode as usual
+//           return true;
+//       }
+//     return true;
+// };
+
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//     if (record->event.pressed) {
+//         switch (keycode) {
+//             case KC_D:
+//                  if (record->tap.count == 2) {
+//                     tap_code16(KC_Y);
+//                     // Do not let QMK process the keycode further
+//                     return false;
+//                 }
+//         }
+//     }
+//     return true;
+// }
+
+
 //Keep num lock always on
 bool led_update_user(led_t led_state) {
     if (!led_state.num_lock) {
