@@ -24,13 +24,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //Tap Dance Declarations
 enum {
   TD_LEFT_SHIFT_CAPS = 0,
-  TD_RIGHT_SHIFT_CAPS = 1
-};
-tap_dance_action_t tap_dance_actions[] = {
-  [TD_LEFT_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(KC_LEFT_SHIFT, KC_CAPS),
-  [TD_RIGHT_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(KC_RIGHT_SHIFT, KC_CAPS)
+  TD_RIGHT_SHIFT_CAPS = 1,
+  TD_D = 2
 };
 
+//---------------
+//ctrl+d -->  ctrl+d
+//ctrl+dd --> ctrl+y
+void dance_d_each(tap_dance_state_t *state, void *user_data) {
+  if (!(get_mods() & MOD_MASK_CTRL) || state->count > 2) {
+    register_code(KC_D);
+  }
+}
+void dance_d_finished(tap_dance_state_t *state, void *user_data) {
+  if(get_mods() & MOD_MASK_CTRL){
+    if (state->count == 1){
+      register_code(KC_D);
+    } else if (state->count == 2){
+      register_code(KC_Y);
+    }
+  }
+}
+void dance_d_reset(tap_dance_state_t *state, void *user_data) {
+  if(get_mods() & MOD_MASK_CTRL && state->count == 2){
+    unregister_code(KC_Y);
+  } else {
+    unregister_code(KC_D);
+  }
+}
+//---------------
+
+tap_dance_action_t tap_dance_actions[] = {
+  [TD_LEFT_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(KC_LEFT_SHIFT, KC_CAPS),
+  [TD_RIGHT_SHIFT_CAPS] = ACTION_TAP_DANCE_DOUBLE(KC_RIGHT_SHIFT, KC_CAPS),
+  [TD_D] = ACTION_TAP_DANCE_FN_ADVANCED(dance_d_each, dance_d_finished, dance_d_reset)
+};
 
 //map shortcuts for mac
 // 1 = LAYER 0, means MAC
@@ -58,40 +86,6 @@ const key_override_t **key_overrides = (const key_override_t *[]){
   NULL // Null terminate the array of overrides!
 };
 
-
-// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-//     switch (keycode) {
-//       case KC_D:
-//           if (get_mods() == MOD_BIT(KC_LCTL) || get_mods() == MOD_BIT(KC_RCTL)) {
-//               if (record->event.pressed && record->tap.count == 2) {
-//                   register_code(KC_Y);
-//               } else {
-//                   unregister_code(KC_Y);
-//               }
-//               // Do not let QMK process the keycode further
-//               return false;
-//           }
-//           // Else, let QMK process the KC_D keycode as usual
-//           return true;
-//       }
-//     return true;
-// };
-
-// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-//     if (record->event.pressed) {
-//         switch (keycode) {
-//             case KC_D:
-//                  if (record->tap.count == 2) {
-//                     tap_code16(KC_Y);
-//                     // Do not let QMK process the keycode further
-//                     return false;
-//                 }
-//         }
-//     }
-//     return true;
-// }
-
-
 //Keep num lock always on
 bool led_update_user(led_t led_state) {
     if (!led_state.num_lock) {
@@ -109,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	KC_ESC, 	KC_F1,  	KC_F2,  	KC_F3, 		KC_F4,  	KC_F5,  	KC_F6, 		KC_F7,  	KC_F8,  	KC_F9,      KC_DEL,		KC_HOME,	KC_END,		KC_PGUP,	KC_PGDN,                    KC_PSCR, 	KC_F10, 	KC_F11, 	KC_F12,
 	KC_GRV, 	KC_1,   	KC_2,   	KC_3,  		KC_4,   	KC_5,   	KC_6,   	KC_7,   	KC_8,   	KC_9,  		KC_0,   	KC_MINS,	KC_EQL, 	KC_BSPC,	        	                KC_INS, 	KC_PSLS,    KC_PAST,	KC_PMNS,
 	KC_TAB, 	KC_Q,   	KC_W,   	KC_E,  		KC_R,   	KC_T,   	KC_Y,   	KC_U,   	KC_I,   	KC_O,  		KC_P,   	KC_LBRC,	KC_RBRC, 	KC_BSLS,	                            KC_P7,		KC_P8,		KC_P9,		KC_PPLS,
-	KC_LALT,	KC_A,   	KC_S,   	KC_D,  		KC_F,   	KC_G,   	KC_H,   	KC_J,   	KC_K,   	KC_L,  		KC_SCLN,	KC_QUOT, 	KC_ENT,							                    KC_P4,		KC_P5,		KC_P6,
+	KC_LALT,	KC_A,   	KC_S,   	TD(TD_D), KC_F,   	KC_G,   	KC_H,   	KC_J,   	KC_K,   	KC_L,  		KC_SCLN,	KC_QUOT, 	KC_ENT,							                    KC_P4,		KC_P5,		KC_P6,
 	TD(TD_LEFT_SHIFT_CAPS),				KC_Z,   	KC_X,   	KC_C,  		KC_V,   	KC_B,   	KC_N,   	KC_M,   	KC_COMM,	KC_DOT,		KC_SLSH,	TD(TD_RIGHT_SHIFT_CAPS),    KC_UP,		KC_P1,		KC_P2,		KC_P3,		KC_PENT,
 	KC_LCTL,	KC_LGUI,	KC_RALT,										KC_SPC, 							KC_RALT,	MO(1),   	KC_RCTL,							    KC_LEFT,    KC_DOWN,    KC_RGHT,	KC_P0,		KC_PDOT),
 // layer 1 Mac Fn
@@ -125,7 +119,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	KC_ESC, 	KC_F1,  	KC_F2,  	KC_F3, 		KC_F4,  	KC_F5,  	KC_F6, 		KC_F7,  	KC_F8,  	KC_F9,      KC_DEL,		KC_HOME,	KC_END,		KC_PGUP,	KC_PGDN,                KC_PSCR, 	KC_F10, 	KC_F11, 	KC_F12,
 	KC_GRV, 	KC_1,   	KC_2,   	KC_3,  		KC_4,   	KC_5,   	KC_6,   	KC_7,   	KC_8,   	KC_9,  		KC_0,   	KC_MINS,	KC_EQL, 	KC_BSPC,	        	            KC_INS,	    KC_PSLS,    KC_PAST,	KC_PMNS,
 	KC_TAB, 	KC_Q,   	KC_W,   	KC_E,  		KC_R,   	KC_T,   	KC_Y,   	KC_U,   	KC_I,   	KC_O,  		KC_P,   	KC_LBRC,	KC_RBRC, 	KC_BSLS,	                        KC_P7,		KC_P8,		KC_P9,		KC_PPLS,
-	KC_LALT,	KC_A,   	KC_S,   	KC_D,  		KC_F,   	KC_G,   	KC_H,   	KC_J,   	KC_K,   	KC_L,  		KC_SCLN,	KC_QUOT, 	KC_ENT,							                KC_P4,		KC_P5,		KC_P6,
+	KC_LALT,	KC_A,   	KC_S,   	TD(TD_D), KC_F,   	KC_G,   	KC_H,   	KC_J,   	KC_K,   	KC_L,  		KC_SCLN,	KC_QUOT, 	KC_ENT,							                KC_P4,		KC_P5,		KC_P6,
 	TD(TD_LEFT_SHIFT_CAPS),				KC_Z,   	KC_X,   	KC_C,  		KC_V,   	KC_B,   	KC_N,   	KC_M,   	KC_COMM,	KC_DOT,		KC_SLSH,	TD(TD_RIGHT_SHIFT_CAPS),  KC_UP,	KC_P1,		KC_P2,		KC_P3,		KC_PENT,
 	KC_LCTL,	KC_LGUI,	KC_RALT,										KC_SPC, 							KC_RALT,	MO(3),   	KC_RCTL,							    KC_LEFT,  KC_DOWN,    KC_RGHT,	KC_P0,		KC_PDOT),
 // layer 3 win Fn
